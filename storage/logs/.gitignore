@@ -1,0 +1,39 @@
+# Laravel-specific files
+/vendor
+/node_modules
+/public/hot
+/public/storage
+/storage/*.key
+/storage/app/public
+/storage/framework
+/storage/logs
+/bootstrap/cache
+
+# Flask-specific files
+flask_api/venv
+flask_api/__pycache__
+flask_api/*.pyc
+flask_api/.env
+
+# Environment files (Secrets & Configs)
+.env
+.env.local
+.env.development
+.env.production
+
+# Logs, caches, and debugging files
+/.vscode
+/.idea
+*.log
+*.swp
+*.swo
+npm-debug.log
+yarn-error.log
+
+# Composer & Node dependencies
+composer.lock
+package-lock.json
+
+# Other unnecessary files
+*.DS_Store
+Thumbs.db
