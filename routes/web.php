@@ -28,7 +28,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // ✅ Mental Health Screening (Initial Prediction)
     Route::get('/screening', [PredictionController::class, 'index'])->name('screening');
-    Route::get('/mental-health-screening', [PredictionController::class, 'index'])->name('mental_health_screening');
+    Route::get('/mental-health-screening', fn() => redirect()->route('screening'));
 
     // ✅ Save responses before sending to Flask
     Route::post('/screening/submit', [ScreeningController::class, 'store'])->name('screening.submit');
@@ -36,23 +36,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // ✅ Assessment & Evaluation (Severity Assessment)
     Route::get('/assessment', [AssessmentController::class, 'index'])->name('assessment');
-
-    // ✅ Assessment History Route (Fixed)
     Route::get('/assessment/history', [AssessmentController::class, 'history'])->name('assessment.history');
-
-    // ✅ Assessment Hub - Displays available severity assessment options
     Route::get('/assessment-hub', [AssessmentController::class, 'hub'])->name('assessment_hub');
 
-    // ✅ Individual Assessment Routes
-    Route::get('/assessment/anxiety', [AssessmentController::class, 'anxiety'])->name('anxiety_assessment');
-    Route::get('/assessment/depression', fn() => Inertia::render('Assessment/DepressionAssessment'))->name('depression_assessment');
-    Route::get('/assessment/ptsd', fn() => Inertia::render('Assessment/PTSDAssessment'))->name('ptsd_assessment');
-    Route::get('/assessment/stress-related', fn() => Inertia::render('Assessment/StressAssessment'))->name('stress_assessment');
-    Route::get('/assessment/substance-use', fn() => Inertia::render('Assessment/SubstanceUseAssessment'))->name('substance_use_assessment');
-    Route::get('/assessment/eating-disorder', fn() => Inertia::render('Assessment/EatingDisorderAssessment'))->name('eating_disorder_assessment');
-    Route::get('/assessment/self-harm', fn() => Inertia::render('Assessment/SelfHarmAssessment'))->name('self_harm_assessment');
-    Route::get('/assessment/attention-issues', fn() => Inertia::render('Assessment/AttentionIssuesAssessment'))->name('attention_issues_assessment');
+    // ✅ Individual Assessment Routes (Standardized for Controller Handling)
+    Route::prefix('assessment')->group(function () {
+        Route::get('/anxiety', [AssessmentController::class, 'anxiety'])->name('anxiety_assessment');
+        Route::get('/depression', [DepressionAssessmentController::class, 'index'])->name('depression_assessment');
+        Route::get('/ptsd', [PTSDAssessmentController::class, 'index'])->name('ptsd_assessment');
+        Route::get('/stress-related', [StressAssessmentController::class, 'index'])->name('stress_assessment');
+        Route::get('/substance-use', [AssessmentController::class, 'substanceUse'])->name('substance_use_assessment');
+        Route::get('/eating-disorder', [AssessmentController::class, 'eatingDisorder'])->name('eating_disorder_assessment');
+        Route::get('/self-harm', [AssessmentController::class, 'selfHarm'])->name('self_harm_assessment');
+        Route::get('/attention-issues', [AssessmentController::class, 'attentionIssues'])->name('attention_issues_assessment');
+    });
 
+    // ✅ Store and Retrieve Assessment Results
     Route::post('/assessment/anxiety/store', [AssessmentController::class, 'storeAnxiety'])->name('assessment.anxiety.store');
     Route::get('/assessment/anxiety/results', [AssessmentController::class, 'showAnxietyResults'])->name('assessment.anxiety.results');
 
@@ -68,14 +67,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 // ✅ Admin Routes
 Route::middleware(['auth'])->group(function () {
-    Route::get('/admin', fn() => Inertia::render('Dashboard'))->name('admin.dashboard');
+    Route::get('/admin', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/admin/results', [AdminController::class, 'results'])->name('admin.results');
 });
 
-// ✅ Profile Routes (Accessible by all authenticated users)
+// ✅ Profile Routes (Ensuring Users Can Only Edit Their Own Profiles)
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::patch('/profile/{user}', [ProfileController::class, 'update'])->middleware('can:update,user')->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 

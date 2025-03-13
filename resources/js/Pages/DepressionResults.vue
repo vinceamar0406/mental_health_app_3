@@ -9,8 +9,9 @@ const pastResults = page.props.past_results || []; // Store previous assessments
 
 // Function to retake the assessment
 const retakeAssessment = () => {
-    router.get('/assessment/depression'); // Ensures a fresh state
+    router.visit('/assessment/depression', { method: 'get', preserveState: false });
 };
+
 
 // Function to go back to the dashboard
 const goToDashboard = () => {
@@ -38,7 +39,7 @@ const goToDashboard = () => {
                     </div>
 
                     <!-- Past Assessments -->
-                    <div v-if="pastResults.length > 0" class="border p-4 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-gray-200">
+                    <div v-if="pastResults && pastResults.length > 0" class="border p-4 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-gray-200">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-200 mb-3">Past Assessments</h3>
                         <div v-for="(result, index) in pastResults" :key="index" class="p-3 border-b last:border-b-0">
                             <p class="text-sm"><strong>Date:</strong> {{ result.date }}</p>

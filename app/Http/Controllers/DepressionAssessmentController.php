@@ -39,8 +39,16 @@ class DepressionAssessmentController extends Controller
 
     return Inertia::render('DepressionResults', [
         'latest_result' => $latestResult,
-        'past_results' => $assessments->skip(1)->values(),
+        'past_results' => $assessments->skip(1)->map(function ($assessment) {
+            return [
+                'total_score' => $assessment->total_score,
+                'severity' => $assessment->severity,
+                'impact' => $assessment->impact,
+                'date' => $assessment->created_at->format('F j, Y'), // Format the date properly
+            ];
+        })->values(),
     ]);
 }
+
 
 }

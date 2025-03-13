@@ -9,9 +9,18 @@ use App\Models\MentalHealthAssessment;
 class AssessmentController extends Controller
 {
     public function index()
-    {
-        return Inertia::render('AssessmentHub');
-    }
+{
+    $user = auth()->user();
+
+    $assessments = MentalHealthAssessment::where('user_id', $user->id)
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+    return Inertia::render('AssessmentHub', [
+        'assessments' => $assessments
+    ]);
+}
+
 
     // ✅ Assessment Hub - Displays available severity assessment options
     public function hub()

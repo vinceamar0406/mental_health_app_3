@@ -9,9 +9,9 @@ class ScreeningResponse extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'responses'];
+    protected $fillable = ['user_id', 'responses', 'predicted_condition'];
 
     protected $casts = [
-        'responses' => 'array', // Automatically cast JSON to an array
+        'responses' => 'array', // Ensure JSON storage works correctly
     ];
 }

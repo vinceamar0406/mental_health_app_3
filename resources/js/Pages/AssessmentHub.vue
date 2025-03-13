@@ -1,9 +1,9 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Link } from '@inertiajs/vue3';
-import { ref } from 'vue';
 import { BookOpenIcon, HeartIcon, BrainIcon, ShieldCheckIcon, CloudDrizzleIcon, AlertTriangleIcon, ActivityIcon, EyeOffIcon } from 'lucide-vue-next';
 
+// Define props
 defineProps({
     assessments: Array
 });
@@ -19,6 +19,9 @@ const icons = {
     'self_harm_assessment': EyeOffIcon,
     'attention_issues_assessment': BookOpenIcon
 };
+
+// Default icon if an assessment isn't mapped
+const defaultIcon = BookOpenIcon;
 </script>
 
 <template>
@@ -43,7 +46,7 @@ const icons = {
                     hover:shadow-lg transition-all transform hover:scale-105 flex flex-col items-center"
                 >
                     <component
-                        :is="icons[assessment.route]"
+                        :is="icons[assessment.route] || defaultIcon"
                         class="w-12 h-12 text-blue-700 dark:text-blue-400 mb-4"
                     />
                     <Link
