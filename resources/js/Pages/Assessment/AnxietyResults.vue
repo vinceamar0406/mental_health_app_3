@@ -9,12 +9,12 @@ const pastResults = page.props.past_results || []; // Store previous assessments
 
 // Function to retake the assessment
 const retakeAssessment = () => {
-    router.get('/assessment/depression'); // Ensures a fresh state
+    router.visit('/assessment/anxiety', { method: 'get', preserveState: false });
 };
 
 // Function to go back to the dashboard
-const goToDashboard = () => {
-    router.get('/dashboard');
+const goToAssessmentHistory = () => {
+    router.get('/assessment/history');
 };
 </script>
 
@@ -26,7 +26,7 @@ const goToDashboard = () => {
             <div class="w-full max-w-3xl sm:px-6 lg:px-8">
                 <div class="bg-white shadow-md dark:bg-gray-800 sm:rounded-lg p-6">
                     <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-200 mb-4">
-                        Depression Assessment Results
+                        Anxiety Assessment Results
                     </h2>
 
                     <!-- Latest Assessment Result -->
@@ -55,9 +55,9 @@ const goToDashboard = () => {
                             Retake Assessment
                         </button>
                         <button
-                            @click="goToDashboard"
+                            @click="goToAssessmentHistory"
                             class="w-full sm:w-auto px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
-                            Back to Dashboard
+                            View Assessment History
                         </button>
                     </div>
                 </div>

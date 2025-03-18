@@ -35,9 +35,9 @@ const userRole = usePage().props.auth.user.role;
               </div>
 
               <!-- ✅ Updated Navigation Links -->
-              <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
-                  Dashboard
+              <div v-if="!route().current('admin.home')" class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                <NavLink :href="route('assessment.history')" :active="route().current('assessment.history')">
+                  Assessment History
                 </NavLink>
                 <NavLink :href="route('mental_health_screening')" :active="route().current('mental_health_screening')">
                   Mental Health Screening

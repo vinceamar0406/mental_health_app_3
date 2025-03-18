@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AnxietyAssessmentController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DepressionAssessmentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PTSDAssessmentController;
@@ -27,8 +29,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', fn() => Inertia::render('Dashboard'))->name('dashboard');
 
     // ✅ Mental Health Screening (Initial Prediction)
-    Route::get('/screening', [PredictionController::class, 'index'])->name('screening');
-    Route::get('/mental-health-screening', fn() => redirect()->route('screening'));
+    Route::get('/screening', [PredictionController::class, 'index'])->name('mental_health_screening');
+    Route::get('/mental-health-screening', fn() => redirect()->route('mental_health_screening'));
 
     // ✅ Save responses before sending to Flask
     Route::post('/screening/submit', [ScreeningController::class, 'store'])->name('screening.submit');
@@ -39,9 +41,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/assessment/history', [AssessmentController::class, 'history'])->name('assessment.history');
     Route::get('/assessment-hub', [AssessmentController::class, 'hub'])->name('assessment_hub');
 
-    // ✅ Individual Assessment Routes (Standardized for Controller Handling)
+    // ✅ Individual Assessment Routes
     Route::prefix('assessment')->group(function () {
-        Route::get('/anxiety', [AssessmentController::class, 'anxiety'])->name('anxiety_assessment');
+        Route::get('/anxiety', [AnxietyAssessmentController::class, 'index'])->name('anxiety_assessment');
         Route::get('/depression', [DepressionAssessmentController::class, 'index'])->name('depression_assessment');
         Route::get('/ptsd', [PTSDAssessmentController::class, 'index'])->name('ptsd_assessment');
         Route::get('/stress-related', [StressAssessmentController::class, 'index'])->name('stress_assessment');
@@ -52,23 +54,51 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     // ✅ Store and Retrieve Assessment Results
-    Route::post('/assessment/anxiety/store', [AssessmentController::class, 'storeAnxiety'])->name('assessment.anxiety.store');
-    Route::get('/assessment/anxiety/results', [AssessmentController::class, 'showAnxietyResults'])->name('assessment.anxiety.results');
+    Route::post('/assessment/anxiety/store', [AnxietyAssessmentController::class, 'store'])->name('anxiety.assessment.store');
+    Route::get('/assessment/anxiety/results', [AnxietyAssessmentController::class, 'showAnxietyResults'])->name('assessment.anxiety.results');
 
     Route::post('/assessment/depression/store', [DepressionAssessmentController::class, 'store'])->name('assessment.depression.store');
     Route::get('/assessment/depression/results', [DepressionAssessmentController::class, 'results'])->name('depression.results');
 
     Route::post('/assessment/ptsd/store', [PTSDAssessmentController::class, 'store'])->name('ptsd.store');
-    Route::get('/assessment/ptsd/results', [PTSDAssessmentController::class, 'showPTSDResults'])->name('ptsd.results');
+    Route::get('/assessment/ptsd/results', [PTSDAssessmentController::class, 'results'])->name('ptsd.results');
 
     Route::post('/assessment/stress/store', [StressAssessmentController::class, 'store'])->name('stress.store');
-    Route::get('/assessment/stress/results', [StressAssessmentController::class, 'results'])->name('stress.results');
+    Route::get('/assessment/stress/results', [StressAssessmentController::class, 'showPTSDResults'])->name('stress.results');
+
+
+
 });
 
 // ✅ Admin Routes
-Route::middleware(['auth'])->group(function () {
-    Route::get('/admin', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-    Route::get('/admin/results', [AdminController::class, 'results'])->name('admin.results');
+Route::middleware(['auth'])->prefix('admin')->group(function () {
+    Route::get('/home', function () {
+        return Inertia::render('AdminHome', [
+            'totalUsers' => \App\Models\User::count(),
+            'totalAssessments' => \App\Models\Assessment::count(),
+            'totalAppointments' => \App\Models\Appointment::count(),
+            'totalReports' => \App\Models\Report::count(),
+        ]);
+    })->name('admin.home');
+
+    // ✅ User List Page
+    Route::get('/users', function () {
+        return Inertia::render('UserList', [
+            'users' => \App\Models\User::all()
+        ]);
+    })->name('admin.users');
+
+    // ✅ Assessment Taken Page
+    Route::get('/assessments', function () {
+        return Inertia::render('AssessmentTaken', [
+            'assessments' => \App\Models\Assessment::with('user')->get()
+        ]);
+    })->name('admin.assessments');
+
+
+    // ✅ Other Admin Pages
+    Route::get('/appointments', [AdminController::class, 'appointments'])->name('admin.appointments');
+    Route::get('/reports', [AdminController::class, 'reports'])->name('admin.reports');
 });
 
 // ✅ Profile Routes (Ensuring Users Can Only Edit Their Own Profiles)
@@ -77,6 +107,9 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/profile/{user}', [ProfileController::class, 'update'])->middleware('can:update,user')->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+// ✅ Contact Form Submission
+Route::post('/contact/submit', [ContactController::class, 'submit'])->name('contact.submit');
 
 // ✅ Authentication Routes
 require __DIR__.'/auth.php';

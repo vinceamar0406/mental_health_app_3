@@ -1,96 +1,56 @@
-make the retake assessment button to redirect to http://localhost:8000/assessment/ptsd
-
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import Header from '@/Components/Header.vue';
-import { Head, usePage } from '@inertiajs/vue3';
+import { Head, usePage, router } from '@inertiajs/vue3';
 
+// Get assessment results from Laravel backend
 const page = usePage();
-const results = page.props.results;
-const pastResults = page.props.past_results;
+const latestResult = page.props.latest_result || { total_score: 0, severity: "Unknown", impact: "Not provided" };
+const pastResults = page.props.past_results || []; // Store previous assessments
+
+// Function to retake the assessment
+const retakeAssessment = () => {
+    router.visit('/assessment/ptsd', { method: 'get', preserveState: false });
+};
+
+
+// Function to go back to the dashboard
+const goToAssessmentHistory = () => {
+    router.get('/assessment/history');
+};
 </script>
 
 <template>
+    <Head title="PTSD Assessment Results" />
+
     <AuthenticatedLayout>
-        <Head title="PTSD Assessment Results" />
+        <div class="py-12 flex justify-center">
+            <div class="w-full max-w-3xl sm:px-6 lg:px-8">
+                <div class="bg-white shadow-md dark:bg-gray-800 sm:rounded-lg p-6">
+                    <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-200 mb-4">
+                        PTSD Assessment Results
+                    </h2>
 
-        <div class="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
-            <div class="w-full max-w-4xl bg-white dark:bg-gray-800 shadow-lg rounded-lg border border-gray-300 dark:border-gray-700">
-
-                <!-- Header -->
-                <Header title="PTSD Assessment Results" subtitle="Review your PTSD assessment results below." />
-
-                <div class="p-8 text-gray-900 dark:text-gray-100">
-
-                    <!-- Latest Result -->
-                    <div v-if="results" class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg mb-4">
-                        <p class="text-lg font-medium">Your Total PTSD Score:</p>
-                        <p class="text-3xl font-bold text-blue-600 dark:text-blue-400">{{ results.total_score }}</p>
+                    <!-- Latest Assessment Result -->
+                    <div class="border p-4 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-gray-200 mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-200">Latest Result</h3>
+                        <p class="text-lg"><strong>Total Score:</strong> {{ latestResult.total_score }}</p>
+                        <p class="text-lg"><strong>Severity Level:</strong> {{ latestResult.severity }}</p>
+                        <p class="text-lg"><strong>Impact Level:</strong> {{ latestResult.impact }}</p>
                     </div>
 
-                    <div v-if="results" class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg mb-4">
-                        <p class="text-lg font-medium">Severity Level:</p>
-                        <p class="text-2xl font-bold text-red-500 dark:text-red-400">{{ results.severity }}</p>
-                    </div>
-
-                    <div v-if="results" class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg mb-4">
-                        <p class="text-lg font-medium">Impact on Daily Life:</p>
-                        <p class="text-xl font-semibold">{{ results.impact }}</p>
-                    </div>
-
-                    <!-- No Results -->
-                    <div v-if="!results" class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg mb-4">
-                        <p class="text-lg font-medium text-gray-600">No PTSD assessment results found.</p>
-                    </div>
-
-                    <!-- Past Results -->
-                    <div v-if="pastResults && pastResults.length > 0" class="mt-6">
-                        <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Past Results:</h2>
-
-                        <div v-for="(result, index) in pastResults" :key="index" class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg mb-4">
-                            <p class="text-lg font-medium">Total PTSD Score:</p>
-                            <p class="text-3xl font-bold text-blue-600 dark:text-blue-400">{{ result.total_score }}</p>
-
-                            <p class="text-lg font-medium">Severity Level:</p>
-                            <p class="text-2xl font-bold text-red-500 dark:text-red-400">{{ result.severity }}</p>
-
-                            <p class="text-lg font-medium">Impact on Daily Life:</p>
-                            <p class="text-xl font-semibold">{{ result.impact }}</p>
-
-                            <!-- Display Date and Time -->
-                            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                                <strong>Assessment Date:</strong> {{ new Date(result.created_at).toLocaleString() }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Recommendations -->
-                    <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                        <p class="text-lg font-medium">Recommendations:</p>
-                        <ul class="list-disc ml-6 mt-2 space-y-2">
-                            <li>If your symptoms are affecting daily life, consider reaching out to a counselor.</li>
-                            <li>Practice stress management techniques such as mindfulness or journaling.</li>
-                            <li>Engage in physical activities to help regulate emotions.</li>
-                            <li>Connect with support groups or trusted individuals for emotional support.</li>
-                        </ul>
-                    </div>
-
-                    <!-- Retake Assessment Button -->
-                    <div class="mt-6">
-                        <a href="http://localhost:8000/assessment/ptsd"
-                            class="w-full block text-center bg-green-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-green-700 transition">
+                    <!-- Action Buttons -->
+                    <div class="mt-6 flex flex-col sm:flex-row gap-4">
+                        <button
+                            @click="retakeAssessment"
+                            class="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
                             Retake Assessment
-                        </a>
+                        </button>
+                        <button
+                            @click="goToAssessmentHistory"
+                            class="w-full sm:w-auto px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
+                            View Assessment History
+                        </button>
                     </div>
-
-                    <!-- Back to Dashboard Button -->
-                    <div class="mt-6">
-                        <a href="/dashboard"
-                            class="w-full block text-center bg-blue-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition">
-                            Back to Dashboard
-                        </a>
-                    </div>
-
                 </div>
             </div>
         </div>

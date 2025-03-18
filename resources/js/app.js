@@ -11,15 +11,17 @@ const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
-    resolve: (name) =>
-        resolvePageComponent(
+    resolve: (name) => {
+        console.log(`Loading component: ${name}`); // Debugging log
+        return resolvePageComponent(
             `./Pages/${name}.vue`,
-            import.meta.glob('./Pages/**/*.vue'),
-        ),
+            import.meta.glob('./Pages/**/*.vue', { eager: true }) // Ensure components load correctly
+        );
+    },
     setup({ el, App, props, plugin }) {
         return createApp({ render: () => h(App, props) })
             .use(plugin)
-            .use(ZiggyVue) // Correct ZiggyVue usage
+            .use(ZiggyVue)
             .mount(el);
     },
     progress: {

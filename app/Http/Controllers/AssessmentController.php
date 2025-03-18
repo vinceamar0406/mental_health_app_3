@@ -3,24 +3,24 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use App\Models\MentalHealthAssessment;
 
 class AssessmentController extends Controller
 {
     public function index()
-{
-    $user = auth()->user();
+    {
+        $user = auth()->user();
 
-    $assessments = MentalHealthAssessment::where('user_id', $user->id)
-        ->orderBy('created_at', 'desc')
-        ->get();
+        $assessments = MentalHealthAssessment::where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-    return Inertia::render('AssessmentHub', [
-        'assessments' => $assessments
-    ]);
-}
-
+        return Inertia::render('AssessmentHub', [
+            'assessments' => $assessments
+        ]);
+    }
 
     // ✅ Assessment Hub - Displays available severity assessment options
     public function hub()
@@ -81,31 +81,28 @@ class AssessmentController extends Controller
     }
 
     // ✅ Store Anxiety Assessment Responses & Redirect
-    public function storeAnxiety(Request $request)
-    {
-        $validatedData = $request->validate([
-            'responses' => 'required|array',
-            'responses.*' => 'integer|min:1|max:4',
-        ]);
+    // ✅ Store Anxiety Assessment Responses & Redirect
+public function storeAnxiety(Request $request)
+{
+    $request->validate([
+        'responses' => 'required|array|min:9',
+        'impact' => 'required|string',
+        'total_score' => 'required|integer',
+        'severity' => 'required|string',
+    ]);
 
-        $user = auth()->user();
-        $totalScore = array_sum($validatedData['responses']);
-        $severity = $this->determineSeverity($totalScore, 'Anxiety');
+    $assessment = MentalHealthAssessment::create([
+        'user_id' => Auth::id(),
+        'assessment_type' => 'anxiety', // Identify the type of assessment
+        'responses' => json_encode($request->responses),
+        'impact' => $request->impact,
+        'total_score' => $request->total_score,
+        'severity' => $request->severity,
+    ]);
 
-        $assessment = MentalHealthAssessment::create([
-            'user_id' => $user->id,
-            'assessment_type' => 'Anxiety',
-            'responses' => json_encode($validatedData['responses']),
-            'total_score' => $totalScore,
-            'severity' => $severity['level'],
-            'impact' => $severity['impact'],
-        ]);
-
-        return $assessment
-            ? redirect('/assessment/anxiety/results')
-            : redirect()->route('anxiety_assessment')->with('error', 'Failed to save assessment.');
-    }
-
+    // Redirect to the results page
+    return redirect()->route('assessment.anxiety.results');
+}
     // ✅ Store Depression Assessment Responses & Redirect
     public function storeDepression(Request $request)
     {
@@ -131,17 +128,47 @@ class AssessmentController extends Controller
             ? redirect('/assessment/depression/results')
             : redirect()->route('depression_assessment')->with('error', 'Failed to save assessment.');
     }
+    public function storePTSD(Request $request)
+{
+    $validatedData = $request->validate([
+        'responses' => 'required|array',
+        'responses.*' => 'integer|min:1|max:4',
+    ]);
+
+    $user = auth()->user();
+    $totalScore = array_sum($validatedData['responses']);
+    $severity = $this->determineSeverity($totalScore, 'PTSD');
+
+    $assessment = MentalHealthAssessment::create([
+        'user_id' => $user->id,
+        'assessment_type' => 'PTSD',
+        'responses' => json_encode($validatedData['responses']),
+        'total_score' => $totalScore,
+        'severity' => $severity['level'],
+        'impact' => $severity['impact'],
+    ]);
+
+    return $assessment
+        ? redirect('/assessment/ptsd/results')
+        : redirect()->route('ptsd_assessment')->with('error', 'Failed to save assessment.');
+}
+
 
     // ✅ Show Anxiety Assessment Results
     public function showAnxietyResults()
-    {
-        return $this->showResults('Anxiety', 'Assessment/AnxietyResults');
-    }
+{
+    return $this->showResults('Anxiety', 'Assessment/AnxietyResults');
+}
+
 
     // ✅ Show Depression Assessment Results
     public function showDepressionResults()
     {
         return $this->showResults('Depression', 'Assessment/DepressionResults');
+    }
+    public function showPTSDResults()
+    {
+        return $this->showResults('PTSD', 'Assessment/PTSDResults');
     }
 
     // ✅ Generic function to fetch latest & past results for an assessment type
@@ -173,14 +200,16 @@ class AssessmentController extends Controller
         ]);
     }
 
-    // ✅ Fetch User's Past Assessments for Dashboard
+    // ✅ Fetch User's Past Assessments for Dashboard (excluding PTSD to prevent duplication)
     public function history()
     {
         $user = auth()->user();
         $assessments = MentalHealthAssessment::where('user_id', $user->id)
-            ->whereIn('assessment_type', ['Anxiety', 'Depression']) // Include both
+            ->whereIn('assessment_type', ['Anxiety', 'Depression', 'PTSD'])
             ->orderBy('created_at', 'desc')
             ->get();
+
+
 
         return Inertia::render('AssessmentHistory', [
             'assessments' => $assessments,

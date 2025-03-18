@@ -12,10 +12,9 @@ const retakeAssessment = () => {
     router.visit('/assessment/depression', { method: 'get', preserveState: false });
 };
 
-
 // Function to go back to the dashboard
-const goToDashboard = () => {
-    router.get('/dashboard');
+const goToAssessmentHistory = () => {
+    router.get('/assessment/history');
 };
 </script>
 
@@ -38,15 +37,6 @@ const goToDashboard = () => {
                         <p class="text-lg"><strong>Impact Level:</strong> {{ latestResult.impact }}</p>
                     </div>
 
-                    <!-- Past Assessments -->
-                    <div v-if="pastResults && pastResults.length > 0" class="border p-4 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-gray-200">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-200 mb-3">Past Assessments</h3>
-                        <div v-for="(result, index) in pastResults" :key="index" class="p-3 border-b last:border-b-0">
-                            <p class="text-sm"><strong>Date:</strong> {{ result.date }}</p>
-                            <p class="text-sm"><strong>Score:</strong> {{ result.total_score }}</p>
-                            <p class="text-sm"><strong>Severity:</strong> {{ result.severity }}</p>
-                        </div>
-                    </div>
 
                     <!-- Action Buttons -->
                     <div class="mt-6 flex flex-col sm:flex-row gap-4">
@@ -56,9 +46,9 @@ const goToDashboard = () => {
                             Retake Assessment
                         </button>
                         <button
-                            @click="goToDashboard"
+                            @click="goToAssessmentHistory"
                             class="w-full sm:w-auto px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
-                            Back to Dashboard
+                            View Assessment History
                         </button>
                     </div>
                 </div>
