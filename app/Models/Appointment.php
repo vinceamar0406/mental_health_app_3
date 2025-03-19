@@ -9,12 +9,14 @@ class Appointment extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'user_id', 'date', 'time', 'status',
-    ];
+    protected $fillable = ['user_id', 'assessment_id', 'status', 'appointment_date'];
 
-    public function user()
-    {
+    // Relationships
+    public function user() {
         return $this->belongsTo(User::class);
+    }
+
+    public function assessment() {
+        return $this->belongsTo(MentalHealthAssessment::class);
     }
 }

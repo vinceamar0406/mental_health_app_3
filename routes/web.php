@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AnxietyAssessmentController;
+use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DepressionAssessmentController;
 use App\Http\Controllers\ProfileController;
@@ -100,6 +101,10 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/appointments', [AdminController::class, 'appointments'])->name('admin.appointments');
     Route::get('/reports', [AdminController::class, 'reports'])->name('admin.reports');
 });
+Route::post('/appointments/request', [AppointmentController::class, 'requestAppointment'])->name('appointments.request');
+Route::post('/appointments/{appointment}/approve', [AppointmentController::class, 'approveAppointment'])->name('appointments.approve');
+Route::post('/appointments/{appointment}/complete', [AppointmentController::class, 'completeAppointment'])->name('appointments.complete');
+
 
 // ✅ Profile Routes (Ensuring Users Can Only Edit Their Own Profiles)
 Route::middleware(['auth'])->group(function () {

@@ -22,9 +22,16 @@ class MentalHealthAssessment extends Model
         'responses' => 'array', // Store responses as JSON in the database
     ];
 
+
     // Relationship: Each assessment belongs to a user
     public function user()
     {
         return $this->belongsTo(User::class);
     }
+
+    public function appointment()
+{
+    return $this->hasOne(Appointment::class, 'assessment_id');
+}
+
 }

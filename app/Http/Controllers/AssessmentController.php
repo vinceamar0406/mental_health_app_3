@@ -202,19 +202,54 @@ public function storeAnxiety(Request $request)
 
     // ✅ Fetch User's Past Assessments for Dashboard (excluding PTSD to prevent duplication)
     public function history()
-    {
-        $user = auth()->user();
-        $assessments = MentalHealthAssessment::where('user_id', $user->id)
-            ->whereIn('assessment_type', ['Anxiety', 'Depression', 'PTSD'])
-            ->orderBy('created_at', 'desc')
-            ->get();
+{
+    $user = auth()->user();
+    $assessments = MentalHealthAssessment::where('user_id', $user->id)
+        ->whereIn('assessment_type', ['Anxiety', 'Depression', 'PTSD'])
+        ->with('appointment') // Load related appointment data
+        ->orderBy('created_at', 'desc')
+        ->get()
+        ->map(function ($assessment) {
+            return [
+                'id' => $assessment->id,
+                'assessment_type' => $assessment->assessment_type,
+                'total_score' => $assessment->total_score,
+                'severity' => $assessment->severity,
+                'impact' => $assessment->impact,
+                'created_at' => $assessment->created_at,
+                'appointment_status' => optional($assessment->appointment)->status ?? 'none',
+                'appointment_date' => optional($assessment->appointment)->appointment_date,
+            ];
+        });
 
+    return Inertia::render('AssessmentHistory', [
+        'assessments' => $assessments,
+    ]);
+}
 
+    public function getAssessments()
+{
+    $user = Auth::user();
 
-        return Inertia::render('AssessmentHistory', [
-            'assessments' => $assessments,
-        ]);
-    }
+    $assessments = MentalHealthAssessment::where('user_id', $user->id)
+        ->with(['appointment']) // Load related appointment if it exists
+        ->get()
+        ->map(function ($assessment) {
+            return [
+                'id' => $assessment->id,
+                'assessment_type' => $assessment->assessment_type,
+                'total_score' => $assessment->total_score,
+                'severity' => $assessment->severity,
+                'impact' => $assessment->impact,
+                'created_at' => $assessment->created_at,
+                'appointment_status' => $assessment->appointment->status ?? 'none',
+                'appointment_date' => optional($assessment->appointment)->appointment_date,
+            ];
+        });
+
+    return Inertia::render('AssessmentHistory', ['assessments' => $assessments]);
+}
+
 
     // ✅ Determine severity level based on type & score
     private function determineSeverity($score, $type)
