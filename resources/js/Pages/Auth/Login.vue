@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import Checkbox from '@/Components/Checkbox.vue';
@@ -20,36 +20,51 @@ const form = useForm({
 });
 
 const isPasswordVisible = ref(false);
+const isProcessing = ref(false);
 
+// Form submission with animated loading state
 const submit = () => {
+    isProcessing.value = true;
     form.post(route('login'), {
-        onFinish: () => form.reset('password'),
+        onFinish: () => {
+            form.reset('password');
+            setTimeout(() => (isProcessing.value = false), 600);
+        },
     });
 };
+
+const buttonClasses = computed(() => ({
+    'opacity-50 cursor-not-allowed': isProcessing.value || form.processing,
+}));
 </script>
 
 <template>
     <GuestLayout>
         <Head title="Log in" />
 
-        <div class="flex min-h-screen w-full items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 dark:from-gray-900 dark:to-gray-800">
-            <div class="w-full max-w-md p-8 bg-white dark:bg-gray-900 rounded-2xl shadow-2xl transform transition-all duration-500 hover:scale-[1.02]">
-                <h2 class="text-3xl font-bold text-center text-gray-800 dark:text-gray-100">Welcome Back 👋</h2>
-                <p class="text-center text-gray-600 dark:text-gray-400 mt-1">Log in to your account</p>
+        <!-- Full-screen background with modern gradient -->
+        <div class="flex min-h-screen w-full items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 dark:from-gray-900 dark:to-gray-800 px-6">
+            <div class="w-full max-w-lg text-center space-y-6">
 
-                <div v-if="status" class="p-4 mt-4 text-sm text-green-600 bg-green-100 rounded-lg dark:bg-green-800 dark:text-green-200">
+                <!-- Welcome Title -->
+                <h2 class="text-4xl font-extrabold text-white drop-shadow-md">Welcome Back </h2>
+                <p class="text-lg text-gray-200">Log in to your account and continue your journey</p>
+
+                <!-- Status Message -->
+                <div v-if="status" class="p-4 mt-2 text-sm text-green-100 bg-green-500 rounded-lg shadow-md">
                     {{ status }}
                 </div>
 
-                <form @submit.prevent="submit" class="mt-6 space-y-5">
+                <!-- Login Form -->
+                <form @submit.prevent="submit" class="mt-4 space-y-5 bg-white dark:bg-gray-900 rounded-xl shadow-lg p-8 transition-all duration-500">
                     <!-- Email Field -->
                     <div>
                         <InputLabel for="email" value="Email" class="text-gray-700 dark:text-gray-300" />
                         <TextInput
                             id="email"
                             type="email"
-                            class="w-full px-4 py-3 mt-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 transition-all duration-300"
-                            v-model="form.email"
+                            class="w-full px-4 py-3 mt-2 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 transition-all duration-300"
+                            v-model.lazy="form.email"
                             required
                             autofocus
                             autocomplete="username"
@@ -64,15 +79,17 @@ const submit = () => {
                             <TextInput
                                 id="password"
                                 :type="isPasswordVisible ? 'text' : 'password'"
-                                class="w-full px-4 py-3 mt-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 transition-all duration-300"
+                                class="w-full px-4 py-3 mt-2 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 transition-all duration-300"
                                 v-model="form.password"
                                 required
-                                autocomplete="current-password"
+                                autocomplete="off"
                             />
+                            <!-- Toggle Password Visibility -->
                             <button
                                 type="button"
                                 @click="isPasswordVisible = !isPasswordVisible"
-                                class="absolute inset-y-0 right-3 flex items-center text-gray-500 dark:text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400 transition-all duration-300"
+                                class="absolute inset-y-0 right-4 flex items-center text-gray-500 dark:text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400 transition-all duration-300"
+                                aria-label="Toggle password visibility"
                             >
                                 <svg v-if="isPasswordVisible" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path d="M10 3a7 7 0 00-7 7 7 7 0 0014 0 7 7 0 00-7-7zm0 12a5 5 0 110-10 5 5 0 010 10z" />
@@ -103,21 +120,26 @@ const submit = () => {
                     <!-- Login Button -->
                     <div>
                         <PrimaryButton
-                            class="w-full py-3 text-lg font-semibold tracking-wide bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-md transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-indigo-400 flex items-center justify-center"
-                            :class="{ 'opacity-25': form.processing }"
-                            :disabled="form.processing"
-                        >
-                            Log in
-                        </PrimaryButton>
+    class="w-full flex items-center justify-center gap-2"
+    :class="buttonClasses"
+    :disabled="isProcessing || form.processing"
+>
+    <svg v-if="isProcessing" class="animate-spin h-5 w-5 text-gray-900" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <circle cx="12" cy="12" r="10" stroke-width="4" class="opacity-25"></circle>
+        <path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M4 12a8 8 0 0116 0"></path>
+    </svg>
+    <span>Log in</span>
+</PrimaryButton>
+
                     </div>
                 </form>
 
                 <!-- Sign Up Option -->
-                <p class="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
+                <p class="mt-4 text-center text-sm text-gray-200">
                     Don't have an account?
                     <Link
                         :href="route('register')"
-                        class="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 transition-all duration-300"
+                        class="text-indigo-200 hover:text-indigo-100 transition-all duration-300"
                     >
                         Sign up
                     </Link>
