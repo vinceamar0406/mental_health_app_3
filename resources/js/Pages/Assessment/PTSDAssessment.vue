@@ -103,8 +103,8 @@ const submitPTSDAssessment = async () => {
     <AuthenticatedLayout>
         <Head title="PTSD Assessment" />
 
-        <div class="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
-            <div class="w-full max-w-4xl bg-white dark:bg-gray-800 shadow-lg rounded-lg border border-gray-300 dark:border-gray-700">
+        <div class="min-h-screen bg-blue-100 dark:bg-gray-900 flex items-center justify-center">
+            <div class="w-full max-w-4xl bg-blue-200 dark:bg-gray-800 shadow-lg rounded-lg border border-blue-300 dark:border-gray-700">
 
                 <!-- Reusable Header -->
                 <Header title="PCL-5 PTSD Assessment" subtitle="Think about your worst stressful event and rate how much each symptom bothered you in the past month." />
@@ -167,12 +167,53 @@ const submitPTSDAssessment = async () => {
                         </div>
                     </div>
 
+                    <!-- PTSD Severity Explanation -->
+                    <div class="mt-8 p-4 bg-blue-100 dark:bg-gray-700 rounded-lg">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">PTSD Severity Levels</h3>
+                        <p class="text-gray-800 dark:text-gray-300">Your total score determines the severity of your PTSD symptoms based on the PCL-5 scale. A score of 33 or higher is considered clinically significant for PTSD.</p>
+                        <table class="w-full mt-2 border border-gray-300 dark:border-gray-600">
+                            <thead>
+                                <tr class="bg-blue-300 dark:bg-gray-600">
+                                    <th class="p-2 border">Total Score</th>
+                                    <th class="p-2 border">Severity Level</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="p-2 border">0–19</td>
+                                    <td class="p-2 border">Minimal or no PTSD symptoms</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 border">20–39</td>
+                                    <td class="p-2 border">Mild PTSD symptoms</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 border">40–59</td>
+                                    <td class="p-2 border">Moderate PTSD symptoms</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 border">60–79</td>
+                                    <td class="p-2 border">Severe PTSD symptoms</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 border">80</td>
+                                    <td class="p-2 border">Very severe PTSD symptoms</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
                     <!-- Submit Button -->
                     <div class="mt-6">
-                        <button @click="submitPTSDAssessment"
+                        <button @click="submitAssessment"
                             class="w-full bg-blue-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition">
                             {{ isLoading ? 'Submitting...' : 'Submit Assessment' }}
                         </button>
+                    </div>
+                     <!-- Reference Information -->
+                     <div class="mt-6 p-4 bg-gray-200 dark:bg-gray-700 rounded-lg">
+                        <h3 class="text-lg font-semibold">Reference</h3>
+                        <p class="text-sm">Weathers, F. W., Litz, B. T., Keane, T. M., Palmieri, P. A., Marx, B. P., & Schnurr, P. P. (2013). The PTSD Checklist for DSM-5 (PCL-5). National Center for PTSD.</p>
                     </div>
                 </div>
             </div>

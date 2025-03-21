@@ -24,13 +24,13 @@ const goToAssessmentHistory = () => {
     <AuthenticatedLayout>
         <div class="py-12 flex justify-center">
             <div class="w-full max-w-3xl sm:px-6 lg:px-8">
-                <div class="bg-white shadow-md dark:bg-gray-800 sm:rounded-lg p-6">
-                    <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-200 mb-4">
+                <div class="bg-blue-100 shadow-md dark:bg-gray-800 sm:rounded-lg p-6">
+                    <h2 class="text-2xl font-semibold text-blue-800 dark:text-blue-300 mb-4">
                         Depression Assessment Results
                     </h2>
 
                     <!-- Latest Assessment Result -->
-                    <div class="border p-4 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-gray-200 mb-6">
+                    <div class="border p-4 rounded-lg bg-white dark:bg-gray-700 dark:text-gray-200 mb-6">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-200">Latest Result</h3>
                         <p class="text-lg"><strong>Total Score:</strong> {{ latestResult.total_score }}</p>
                         <p class="text-lg"><strong>Severity Level:</strong> {{ latestResult.severity }}</p>
@@ -47,7 +47,7 @@ const goToAssessmentHistory = () => {
                         </button>
                         <button
                             @click="goToAssessmentHistory"
-                            class="w-full sm:w-auto px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
+                            class="w-full sm:w-auto px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
                             View Assessment History
                         </button>
                     </div>

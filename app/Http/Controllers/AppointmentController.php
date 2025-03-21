@@ -6,35 +6,44 @@ use Illuminate\Http\Request;
 use App\Models\Appointment;
 use App\Models\MentalHealthAssessment;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class AppointmentController extends Controller
 {
     // Request an Appointment
     public function requestAppointment(Request $request)
-    {
-        $user = Auth::user();
-        $assessmentId = $request->assessment_id;
+{
+    $user = Auth::user();
+    $assessmentId = $request->assessment_id;
 
-        // Check if an appointment already exists for this assessment and user
-        $existingAppointment = Appointment::where('user_id', $user->id)
-            ->where('assessment_id', $assessmentId)
-            ->where('status', 'pending')
-            ->first();
+    // Check if an appointment already exists for this assessment and user
+    $existingAppointment = Appointment::where('user_id', $user->id)
+        ->where('assessment_id', $assessmentId)
+        ->where('status', 'pending')
+        ->first();
 
-        if ($existingAppointment) {
-            return redirect()->route('assessment.history')->with('status', 'Appointment requested successfully.');
-        }
-
-        // Create new appointment if no existing request is found
-        $appointment = new Appointment();
-        $appointment->user_id = $user->id;
-        $appointment->assessment_id = $assessmentId;
-        $appointment->status = 'pending';
-        $appointment->save();
-
-        return response()->json(['message' => 'Appointment requested successfully!'], 201);
+    if ($existingAppointment) {
+        // If the appointment already exists, return to the assessment history page with a status message
+        return Inertia::render('AssessmentHistory', [
+            'message' => 'Appointment already requested.',
+            'appointment_status' => 'pending', // Send the status to update the UI
+            'appointments' => Appointment::where('user_id', $user->id)->get(),
+        ]);
     }
 
+    // Create a new appointment if no existing request is found
+    $appointment = new Appointment();
+    $appointment->user_id = $user->id;
+    $appointment->assessment_id = $assessmentId;
+    $appointment->status = 'pending';
+    $appointment->save();
+
+    // Return an Inertia response with the success message and updated appointment status
+    return Inertia::render('AssessmentHistory', [
+        'message' => 'Appointment requested successfully!',
+        'appointments' => Appointment::where('user_id', $user->id)->get(),
+    ]);
+}
     // Approve an Appointment (Admin)
     public function approveAppointment(Request $request, Appointment $appointment)
 {
@@ -66,9 +75,14 @@ public function completeAppointment(Appointment $appointment)
     }
 
     $appointment->status = 'completed';
+    $appointment->completed_at = now(); // or use any relevant date field
     $appointment->save();
 
-    return response()->json(['message' => 'Appointment marked as completed.']);
+    return response()->json([
+        'message' => 'Appointment marked as completed.',
+        'appointment' => $appointment, // Return the updated appointment data
+    ]);
+
 }
 
 }

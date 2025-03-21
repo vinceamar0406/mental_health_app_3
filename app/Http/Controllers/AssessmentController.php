@@ -152,6 +152,27 @@ public function storeAnxiety(Request $request)
         ? redirect('/assessment/ptsd/results')
         : redirect()->route('ptsd_assessment')->with('error', 'Failed to save assessment.');
 }
+public function storeEatingDisorder(Request $request)
+    {
+        $request->validate([
+            'responses' => 'required|array|min:5',
+            'total_score' => 'required|integer',
+            'severity' => 'required|string',
+            'impact' => 'required|string',
+        ]);
+        // Store the anxiety assessment result in the database
+        MentalHealthAssessment::create([
+            'user_id' => Auth::id(),
+            'assessment_type' => 'Eating Disorder', // Identify the type of assessment
+            'responses' => json_encode($request->responses),
+            'impact' => $request->impact,
+            'total_score' => $request->total_score,
+            'severity' => $request->severity,
+        ]);
+
+        // Redirect to the results page
+        return redirect()->route('assessment.eatingdisorder.results');
+    }
 
 
     // ✅ Show Anxiety Assessment Results
@@ -159,8 +180,6 @@ public function storeAnxiety(Request $request)
 {
     return $this->showResults('Anxiety', 'Assessment/AnxietyResults');
 }
-
-
     // ✅ Show Depression Assessment Results
     public function showDepressionResults()
     {
@@ -170,7 +189,10 @@ public function storeAnxiety(Request $request)
     {
         return $this->showResults('PTSD', 'Assessment/PTSDResults');
     }
-
+    public function showEatingDisorder()
+    {
+        return $this->showResults('Eating Disorder', 'Assessment/EatingDisorderResults');
+    }
     // ✅ Generic function to fetch latest & past results for an assessment type
     private function showResults($type, $view)
     {
@@ -200,12 +222,14 @@ public function storeAnxiety(Request $request)
         ]);
     }
 
+
+
     // ✅ Fetch User's Past Assessments for Dashboard (excluding PTSD to prevent duplication)
     public function history()
 {
     $user = auth()->user();
     $assessments = MentalHealthAssessment::where('user_id', $user->id)
-        ->whereIn('assessment_type', ['Anxiety', 'Depression', 'PTSD'])
+        ->whereIn('assessment_type', ['Anxiety', 'Depression', 'PTSD' , 'Eating Disorder'])
         ->with('appointment') // Load related appointment data
         ->orderBy('created_at', 'desc')
         ->get()

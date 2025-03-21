@@ -5,6 +5,7 @@ use App\Http\Controllers\AnxietyAssessmentController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DepressionAssessmentController;
+use App\Http\Controllers\EatingDisorderAssessmentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PTSDAssessmentController;
 use App\Http\Controllers\ScreeningController;
@@ -49,7 +50,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/ptsd', [PTSDAssessmentController::class, 'index'])->name('ptsd_assessment');
         Route::get('/stress-related', [StressAssessmentController::class, 'index'])->name('stress_assessment');
         Route::get('/substance-use', [AssessmentController::class, 'substanceUse'])->name('substance_use_assessment');
-        Route::get('/eating-disorder', [AssessmentController::class, 'eatingDisorder'])->name('eating_disorder_assessment');
+        Route::get('/eating-disorder', [EatingDisorderAssessmentController::class, 'index'])->name('eating_disorder_assessment');
         Route::get('/self-harm', [AssessmentController::class, 'selfHarm'])->name('self_harm_assessment');
         Route::get('/attention-issues', [AssessmentController::class, 'attentionIssues'])->name('attention_issues_assessment');
     });
@@ -67,6 +68,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/assessment/stress/store', [StressAssessmentController::class, 'store'])->name('stress.store');
     Route::get('/assessment/stress/results', [StressAssessmentController::class, 'showPTSDResults'])->name('stress.results');
 
+    Route::post('/assessment/eating-disorder/store', [EatingDisorderAssessmentController::class, 'storeEatingDisorder'])->name('eating-disorder.assessment.store');
+    Route::get('/assessment/eating-disorder/results', [EatingDisorderAssessmentController::class, 'showEatingDisorder'])->name('assessment.eatingdisorder.results');
 
 
 });
