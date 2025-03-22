@@ -6,6 +6,7 @@ import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
 import { Link, usePage } from '@inertiajs/vue3';
+import { onMounted } from 'vue';
 
 const showingNavigationDropdown = ref(false);
 
@@ -17,6 +18,15 @@ defineProps({
 
 // Get user role from Inertia props
 const userRole = usePage().props.auth.user.role;
+// Automatically detect login from another tab
+onMounted(() => {
+    window.addEventListener('storage', (event) => {
+        if (event.key === 'isLoggedIn' && event.newValue === 'true') {
+            window.location.reload(); // Reload to reflect login state
+        }
+    });
+});
+
 </script>
 
 <template>
@@ -29,7 +39,7 @@ const userRole = usePage().props.auth.user.role;
             <div class="flex">
               <!-- Logo -->
               <div class="flex shrink-0 items-center">
-                <Link :href="route('dashboard')">
+                <Link :href="route('assessment.history')">
                   <ApplicationLogo class="block h-9 w-auto fill-current text-black dark:text-gray-200" />
                 </Link>
               </div>
@@ -94,7 +104,7 @@ const userRole = usePage().props.auth.user.role;
         <!-- Responsive Navigation Menu -->
         <div :class="{ block: showingNavigationDropdown, hidden: !showingNavigationDropdown }" class="sm:hidden">
           <div class="space-y-1 pb-3 pt-2">
-            <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
+            <ResponsiveNavLink :href="route('assessment.history')" :active="route().current('assessment.history')">
               Dashboard
             </ResponsiveNavLink>
             <ResponsiveNavLink :href="route('mental_health_screening')" :active="route().current('mental_health_screening')">

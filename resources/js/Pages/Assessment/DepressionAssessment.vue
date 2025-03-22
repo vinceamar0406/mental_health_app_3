@@ -7,6 +7,9 @@ import { ref, computed, reactive } from 'vue';
 const page = usePage();
 const isLoading = ref(false);
 
+//Set the page title dynamically
+page.props.title = "Depression Assessment"
+
 // User's responses
 const answers = reactive({
     q1: null, q2: null, q3: null, q4: null, q5: null, q6: null, q7: null, q8: null, q9: null, impact: ""

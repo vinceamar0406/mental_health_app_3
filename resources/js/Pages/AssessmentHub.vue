@@ -3,6 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Link, usePage } from '@inertiajs/vue3';
 import Swal from 'sweetalert2'; // Import SweetAlert2
 import { BookOpenIcon, HeartIcon, BrainIcon, ShieldCheckIcon, CloudDrizzleIcon, AlertTriangleIcon, ActivityIcon, EyeOffIcon } from 'lucide-vue-next';
+import { Head } from '@inertiajs/vue3';
 
 // Define props
 defineProps({
@@ -112,6 +113,7 @@ const showLoadingAnimation = (assessment) => {
 </script>
 
 <template>
+    <Head title="Assessment Hub" />
     <AuthenticatedLayout>
         <template #header>
             <h2 class="text-2xl font-bold leading-tight text-black dark:text-white">
